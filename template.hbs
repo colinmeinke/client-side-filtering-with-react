@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Client-side filtering with React</title>
+    <title>{{ title }}</title>
     <link rel="stylesheet"
           href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <meta charset="utf-8" />
   </head>
-  <body>
-    <script src="/app.js"></script>
+  <body {{#each data }}
+          data-{{ @key }}="{{ @this }}"
+        {{/each}}>
+    <section id="content">{{{ content }}}</section>
+    <script src="/browser.js"></script>
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
   </body>

@@ -6,7 +6,9 @@
   "author": "Colin Meinke <hello@colinmeinke.com> (http://colinmeinke.com)",
   "license": "ISC",
   "dependencies": {
+    "clone": "1.0.x",
     "express": "4.13.x",
+    "express-handlebars": "2.0.x",
     "react": "0.13.x"
   },
   "devDependencies": {

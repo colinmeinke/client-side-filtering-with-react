@@ -16,7 +16,10 @@ gulp.task( 'lint', function () {
 });
 
 gulp.task( 'compileServer', [ 'lint' ], function () {
-  return gulp.src( './lib/server.js' )
+  return gulp.src([
+    './lib/**/*.js',
+    '!./lib/browser.js',
+  ])
     .pipe( babel())
     .pipe( gulp.dest( './dist' ));
 });
@@ -24,12 +27,12 @@ gulp.task( 'compileServer', [ 'lint' ], function () {
 gulp.task( 'compileBrowser', [ 'lint' ], function () {
   return browserify({
     'entries': [
-      './lib/app.js',
+      './lib/browser.js',
     ],
   })
     .transform( babelify )
     .bundle()
-    .pipe( stream( 'app.js' ))
+    .pipe( stream( 'browser.js' ))
     .pipe( gulp.dest( './dist' ));
 });
 
