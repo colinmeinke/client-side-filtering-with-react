@@ -150,6 +150,8 @@ module.exports = exports['default'];
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
 var _clone = require('clone');
 
 var _clone2 = _interopRequireDefault(_clone);
@@ -170,19 +172,19 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _document$body$dataset = document.body.dataset;
-var filter = _document$body$dataset.filter;
-var term = _document$body$dataset.term;
+var state = _objectWithoutProperties(document.body.dataset, []);
 
 var props = {
   'covers': _apiCovers2['default'],
   'filters': (0, _clone2['default'])(_apiFilters2['default']),
-  'initialFilterKey': filter,
-  'initialFilterName': _apiFilters2['default'][filter].name,
-  'initialTerm': term
+  'initialFilterKey': state.filter,
+  'initialFilterName': _apiFilters2['default'][state.filter].name,
+  'initialTerm': state.term
 };
 
-props.filters[filter].selected = true;
+props.filters[state.filter].selected = true;
+
+history.replaceState(state, document.title, window.location.href);
 
 _react2['default'].render(_react2['default'].createElement(_componentsFilterFilter2['default'], props), document.getElementById('content'));
 
@@ -289,7 +291,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x2, _x3, _x4) { var _again = true; _function: while (_again) { var object = _x2, property = _x3, receiver = _x4; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x2 = parent; _x3 = property; _x4 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
@@ -317,9 +319,26 @@ var FilterForm = (function (_React$Component) {
       'filter': props.initialFilterKey,
       'term': props.initialTerm
     };
+
+    this.popstateHandlerRef = this.popstateHandler.bind(this);
   }
 
   _createClass(FilterForm, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      window.addEventListener('popstate', this.popstateHandlerRef);
+    }
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      window.removeEventListener('popstate', this.popstateHandlerRef);
+    }
+  }, {
+    key: 'popstateHandler',
+    value: function popstateHandler(e) {
+      this.onChange(e.state, false);
+    }
+  }, {
     key: 'onFilterChange',
     value: function onFilterChange(filter) {
       var state = {
@@ -327,8 +346,7 @@ var FilterForm = (function (_React$Component) {
         'term': this.state.term
       };
 
-      this.setState(state);
-      this.props.onChangeCallback(state);
+      this.onChange(state);
     }
   }, {
     key: 'onTermChange',
@@ -338,8 +356,30 @@ var FilterForm = (function (_React$Component) {
         'term': e.target.value
       };
 
+      this.onChange(state);
+    }
+  }, {
+    key: 'onChange',
+    value: function onChange(state) {
+      var pushState = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+
       this.setState(state);
       this.props.onChangeCallback(state);
+
+      if (pushState) {
+        history.pushState(state, document.title, this.getURL(state));
+      }
+    }
+  }, {
+    key: 'getURL',
+    value: function getURL(state) {
+      var url = window.location.href.split('?')[0] + '?filter=' + state.filter;
+
+      if (state.term) {
+        url += '&term=' + state.term.replace(/ /g, '+');
+      }
+
+      return url;
     }
   }, {
     key: 'render',

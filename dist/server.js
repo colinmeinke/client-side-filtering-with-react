@@ -65,7 +65,8 @@ app.get('/filter.html', function (req, res) {
       'filter': props.initialFilterKey,
       'term': props.initialTerm
     },
-    'content': _react2['default'].renderToString(_react2['default'].createElement(_componentsFilterFilter2['default'], props))
+    'content': _react2['default'].renderToString(_react2['default'].createElement(_componentsFilterFilter2['default'], props)),
+    'title': 'Client-side filtering with React'
   });
 });
 
