@@ -39,9 +39,9 @@ var Filter = (function (_React$Component) {
     _get(Object.getPrototypeOf(Filter.prototype), 'constructor', this).call(this, props);
 
     this.state = {
-      'covers': this.filterCovers(this.props.filters[this.props.initialFilterKey].func, this.props.initialTerm),
-      'highlightText': this.props.initialFilterKey === 'title' ? this.props.initialTerm : '',
-      'title': this.getTitle(this.props.initialFilterKey, this.props.initialTerm)
+      'covers': this.filterCovers(this.props.filters[this.props.initialFilter.key].func, this.props.initialTerm),
+      'highlightText': this.props.initialFilter.key === 'title' ? this.props.initialTerm : '',
+      'title': this.getTitle(this.props.initialFilter.key, this.props.initialTerm)
     };
   }
 
@@ -51,19 +51,19 @@ var Filter = (function (_React$Component) {
       var filter = data.filter;
       var term = data.term;
 
-      var covers = term ? this.filterCovers(this.props.filters[filter].func, term) : this.props.covers;
+      var covers = term ? this.filterCovers(this.props.filters[filter.key].func, term) : this.props.covers;
 
       this.setState({
         'covers': covers,
-        'highlightText': filter === 'title' ? term : '',
-        'title': this.getTitle(filter, term)
+        'highlightText': filter.key === 'title' ? term : '',
+        'title': this.getTitle(filter.key, term)
       });
     }
   }, {
     key: 'getTitle',
-    value: function getTitle(filter, term) {
+    value: function getTitle(filterKey, term) {
       if (term) {
-        var title = this.props.filters[filter].title;
+        var title = this.props.filters[filterKey].title;
         return title.replace(':term', term.toLowerCase());
       }
 
@@ -101,8 +101,7 @@ var Filter = (function (_React$Component) {
         { name: 'filter' },
         _react2['default'].createElement(_filterHeader2['default'], { title: this.state.title }),
         _react2['default'].createElement(_filterForm2['default'], { filters: this.getFilterKeyNamePairs(this.props.filters),
-          initialFilterKey: this.props.initialFilterKey,
-          initialFilterName: this.props.initialFilterName,
+          initialFilter: this.props.initialFilter,
           initialTerm: this.props.initialTerm,
           onChangeCallback: this.onFormChange.bind(this) }),
         _react2['default'].createElement('hr', null),
@@ -118,16 +117,17 @@ var Filter = (function (_React$Component) {
 Filter.propTypes = {
   'covers': _react2['default'].PropTypes.array,
   'filters': _react2['default'].PropTypes.object,
-  'initialFilterKey': _react2['default'].PropTypes.string,
-  'initialFilterName': _react2['default'].PropTypes.string,
+  'initialFilter': _react2['default'].PropTypes.object,
   'initialTerm': _react2['default'].PropTypes.string
 };
 
 Filter.defaultProps = {
   'covers': [],
   'filters': {},
-  'initialFilterKey': '',
-  'initialFilterName': '',
+  'initialFilter': {
+    'key': '',
+    'name': ''
+  },
   'initialTerm': ''
 };
 

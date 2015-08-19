@@ -31,7 +31,7 @@ var FilterForm = (function (_React$Component) {
     _get(Object.getPrototypeOf(FilterForm.prototype), 'constructor', this).call(this, props);
 
     this.state = {
-      'filter': props.initialFilterKey,
+      'filter': props.initialFilter,
       'term': props.initialTerm
     };
 
@@ -88,7 +88,7 @@ var FilterForm = (function (_React$Component) {
   }, {
     key: 'getURL',
     value: function getURL(state) {
-      var url = window.location.href.split('?')[0] + '?filter=' + state.filter;
+      var url = window.location.href.split('?')[0] + '?filterKey=' + state.filter.key;
 
       if (state.term) {
         url += '&term=' + state.term.replace(/ /g, '+');
@@ -103,7 +103,7 @@ var FilterForm = (function (_React$Component) {
         'section',
         { className: 'container input-group' },
         _react2['default'].createElement(_selectSelect2['default'], { items: this.props.filters,
-          initialName: this.props.initialFilterName,
+          name: this.state.filter.name,
           onClickCallback: this.onFilterChange.bind(this) }),
         _react2['default'].createElement('input', { className: 'form-control',
           type: 'text',
@@ -119,16 +119,17 @@ var FilterForm = (function (_React$Component) {
 
 FilterForm.propTypes = {
   'filters': _react2['default'].PropTypes.object,
-  'initialFilterName': _react2['default'].PropTypes.string,
-  'initialFilterKey': _react2['default'].PropTypes.string,
+  'initialFilter': _react2['default'].PropTypes.object,
   'initialTerm': _react2['default'].PropTypes.string,
   'onChangeCallback': _react2['default'].PropTypes.func
 };
 
 FilterForm.defaultProps = {
   'filters': {},
-  'initialFilterName': '',
-  'initialFilterKey': '',
+  'initialFilter': {
+    'key': '',
+    'name': ''
+  },
   'initialTerm': '',
   'onChangeCallback': function onChangeCallback() {}
 };

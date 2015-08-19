@@ -42,19 +42,27 @@ app.get('/browser.js', function (req, res) {
 
 app.get('/filter.html', function (req, res) {
   var state = _extends({
-    'filter': 'title',
+    'filterKey': 'title',
     'term': ''
   }, req.query);
+
+  state.filter = {
+    'key': state.filterKey,
+    'name': _apiFilters2['default'][state.filterKey].name
+  };
+
+  delete state.filterKey;
 
   var props = {
     'covers': _apiCovers2['default'],
     'filters': _extends({}, _apiFilters2['default']),
-    'initialFilterKey': state.filter,
-    'initialFilterName': _apiFilters2['default'][state.filter].name,
+    'initialFilter': state.filter,
     'initialTerm': state.term
   };
 
-  props.filters[state.filter].selected = true;
+  props.filters[state.filter.key].selected = true;
+
+  state.filter = JSON.stringify(state.filter);
 
   res.render('../template.hbs', {
     'content': _react2['default'].renderToString(_react2['default'].createElement(_componentsFilterFilter2['default'], props)),

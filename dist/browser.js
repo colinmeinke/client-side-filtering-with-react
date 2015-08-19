@@ -172,15 +172,16 @@ var _react2 = _interopRequireDefault(_react);
 
 var state = _objectWithoutProperties(document.body.dataset, []);
 
+state.filter = JSON.parse(state.filter);
+
 var props = {
   'covers': _apiCovers2['default'],
   'filters': _extends({}, _apiFilters2['default']),
-  'initialFilterKey': state.filter,
-  'initialFilterName': _apiFilters2['default'][state.filter].name,
+  'initialFilter': state.filter,
   'initialTerm': state.term
 };
 
-props.filters[state.filter].selected = true;
+props.filters[state.filter.key].selected = true;
 
 history.replaceState(state, document.title, window.location.href);
 
@@ -314,7 +315,7 @@ var FilterForm = (function (_React$Component) {
     _get(Object.getPrototypeOf(FilterForm.prototype), 'constructor', this).call(this, props);
 
     this.state = {
-      'filter': props.initialFilterKey,
+      'filter': props.initialFilter,
       'term': props.initialTerm
     };
 
@@ -371,7 +372,7 @@ var FilterForm = (function (_React$Component) {
   }, {
     key: 'getURL',
     value: function getURL(state) {
-      var url = window.location.href.split('?')[0] + '?filter=' + state.filter;
+      var url = window.location.href.split('?')[0] + '?filterKey=' + state.filter.key;
 
       if (state.term) {
         url += '&term=' + state.term.replace(/ /g, '+');
@@ -386,7 +387,7 @@ var FilterForm = (function (_React$Component) {
         'section',
         { className: 'container input-group' },
         _react2['default'].createElement(_selectSelect2['default'], { items: this.props.filters,
-          initialName: this.props.initialFilterName,
+          name: this.state.filter.name,
           onClickCallback: this.onFilterChange.bind(this) }),
         _react2['default'].createElement('input', { className: 'form-control',
           type: 'text',
@@ -402,16 +403,17 @@ var FilterForm = (function (_React$Component) {
 
 FilterForm.propTypes = {
   'filters': _react2['default'].PropTypes.object,
-  'initialFilterName': _react2['default'].PropTypes.string,
-  'initialFilterKey': _react2['default'].PropTypes.string,
+  'initialFilter': _react2['default'].PropTypes.object,
   'initialTerm': _react2['default'].PropTypes.string,
   'onChangeCallback': _react2['default'].PropTypes.func
 };
 
 FilterForm.defaultProps = {
   'filters': {},
-  'initialFilterName': '',
-  'initialFilterKey': '',
+  'initialFilter': {
+    'key': '',
+    'name': ''
+  },
   'initialTerm': '',
   'onChangeCallback': function onChangeCallback() {}
 };
@@ -525,9 +527,9 @@ var Filter = (function (_React$Component) {
     _get(Object.getPrototypeOf(Filter.prototype), 'constructor', this).call(this, props);
 
     this.state = {
-      'covers': this.filterCovers(this.props.filters[this.props.initialFilterKey].func, this.props.initialTerm),
-      'highlightText': this.props.initialFilterKey === 'title' ? this.props.initialTerm : '',
-      'title': this.getTitle(this.props.initialFilterKey, this.props.initialTerm)
+      'covers': this.filterCovers(this.props.filters[this.props.initialFilter.key].func, this.props.initialTerm),
+      'highlightText': this.props.initialFilter.key === 'title' ? this.props.initialTerm : '',
+      'title': this.getTitle(this.props.initialFilter.key, this.props.initialTerm)
     };
   }
 
@@ -537,19 +539,19 @@ var Filter = (function (_React$Component) {
       var filter = data.filter;
       var term = data.term;
 
-      var covers = term ? this.filterCovers(this.props.filters[filter].func, term) : this.props.covers;
+      var covers = term ? this.filterCovers(this.props.filters[filter.key].func, term) : this.props.covers;
 
       this.setState({
         'covers': covers,
-        'highlightText': filter === 'title' ? term : '',
-        'title': this.getTitle(filter, term)
+        'highlightText': filter.key === 'title' ? term : '',
+        'title': this.getTitle(filter.key, term)
       });
     }
   }, {
     key: 'getTitle',
-    value: function getTitle(filter, term) {
+    value: function getTitle(filterKey, term) {
       if (term) {
-        var title = this.props.filters[filter].title;
+        var title = this.props.filters[filterKey].title;
         return title.replace(':term', term.toLowerCase());
       }
 
@@ -587,8 +589,7 @@ var Filter = (function (_React$Component) {
         { name: 'filter' },
         _react2['default'].createElement(_filterHeader2['default'], { title: this.state.title }),
         _react2['default'].createElement(_filterForm2['default'], { filters: this.getFilterKeyNamePairs(this.props.filters),
-          initialFilterKey: this.props.initialFilterKey,
-          initialFilterName: this.props.initialFilterName,
+          initialFilter: this.props.initialFilter,
           initialTerm: this.props.initialTerm,
           onChangeCallback: this.onFormChange.bind(this) }),
         _react2['default'].createElement('hr', null),
@@ -604,16 +605,17 @@ var Filter = (function (_React$Component) {
 Filter.propTypes = {
   'covers': _react2['default'].PropTypes.array,
   'filters': _react2['default'].PropTypes.object,
-  'initialFilterKey': _react2['default'].PropTypes.string,
-  'initialFilterName': _react2['default'].PropTypes.string,
+  'initialFilter': _react2['default'].PropTypes.object,
   'initialTerm': _react2['default'].PropTypes.string
 };
 
 Filter.defaultProps = {
   'covers': [],
   'filters': {},
-  'initialFilterKey': '',
-  'initialFilterName': '',
+  'initialFilter': {
+    'key': '',
+    'name': ''
+  },
   'initialTerm': ''
 };
 
@@ -644,30 +646,23 @@ var _react2 = _interopRequireDefault(_react);
 var Select = (function (_React$Component) {
   _inherits(Select, _React$Component);
 
-  function Select(props) {
+  function Select() {
     _classCallCheck(this, Select);
 
-    _get(Object.getPrototypeOf(Select.prototype), 'constructor', this).call(this, props);
-
-    this.state = {
-      'name': this.props.initialName
-    };
+    _get(Object.getPrototypeOf(Select.prototype), 'constructor', this).apply(this, arguments);
   }
 
   _createClass(Select, [{
     key: 'onClick',
     value: function onClick(e) {
-      var _e$target$dataset = e.target.dataset;
-      var key = _e$target$dataset.key;
-      var name = _e$target$dataset.name;
+      var state = e.target.dataset;
 
       e.preventDefault();
 
-      this.setState({
-        'name': name
+      this.props.onClickCallback({
+        'key': state.key,
+        'name': state.name
       });
-
-      this.props.onClickCallback(key);
     }
   }, {
     key: 'render',
@@ -699,7 +694,7 @@ var Select = (function (_React$Component) {
           { type: 'button',
             className: 'btn btn-default dropdown-toggle',
             'data-toggle': 'dropdown' },
-          this.state.name,
+          this.props.name,
           ' ',
           _react2['default'].createElement('span', { className: 'caret' })
         ),
@@ -717,13 +712,13 @@ var Select = (function (_React$Component) {
 
 Select.propTypes = {
   'items': _react2['default'].PropTypes.object,
-  'initialName': _react2['default'].PropTypes.string,
+  'name': _react2['default'].PropTypes.string,
   'onClickCallback': _react2['default'].PropTypes.func
 };
 
 Select.defaultProps = {
   'items': {},
-  'initialName': '',
+  'name': '',
   'onClickCallback': function onClickCallback() {}
 };
 

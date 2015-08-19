@@ -21,30 +21,23 @@ var _react2 = _interopRequireDefault(_react);
 var Select = (function (_React$Component) {
   _inherits(Select, _React$Component);
 
-  function Select(props) {
+  function Select() {
     _classCallCheck(this, Select);
 
-    _get(Object.getPrototypeOf(Select.prototype), 'constructor', this).call(this, props);
-
-    this.state = {
-      'name': this.props.initialName
-    };
+    _get(Object.getPrototypeOf(Select.prototype), 'constructor', this).apply(this, arguments);
   }
 
   _createClass(Select, [{
     key: 'onClick',
     value: function onClick(e) {
-      var _e$target$dataset = e.target.dataset;
-      var key = _e$target$dataset.key;
-      var name = _e$target$dataset.name;
+      var state = e.target.dataset;
 
       e.preventDefault();
 
-      this.setState({
-        'name': name
+      this.props.onClickCallback({
+        'key': state.key,
+        'name': state.name
       });
-
-      this.props.onClickCallback(key);
     }
   }, {
     key: 'render',
@@ -76,7 +69,7 @@ var Select = (function (_React$Component) {
           { type: 'button',
             className: 'btn btn-default dropdown-toggle',
             'data-toggle': 'dropdown' },
-          this.state.name,
+          this.props.name,
           ' ',
           _react2['default'].createElement('span', { className: 'caret' })
         ),
@@ -94,13 +87,13 @@ var Select = (function (_React$Component) {
 
 Select.propTypes = {
   'items': _react2['default'].PropTypes.object,
-  'initialName': _react2['default'].PropTypes.string,
+  'name': _react2['default'].PropTypes.string,
   'onClickCallback': _react2['default'].PropTypes.func
 };
 
 Select.defaultProps = {
   'items': {},
-  'initialName': '',
+  'name': '',
   'onClickCallback': function onClickCallback() {}
 };
 
