@@ -1,10 +1,8 @@
 'use strict';
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var _clone = require('clone');
-
-var _clone2 = _interopRequireDefault(_clone);
 
 var _apiCovers = require('./api/covers');
 
@@ -43,29 +41,24 @@ app.get('/browser.js', function (req, res) {
 });
 
 app.get('/filter.html', function (req, res) {
+  var state = _extends({
+    'filter': 'title',
+    'term': ''
+  }, req.query);
+
   var props = {
     'covers': _apiCovers2['default'],
-    'filters': (0, _clone2['default'])(_apiFilters2['default']),
-    'initialTerm': req.query.term || ''
+    'filters': _extends({}, _apiFilters2['default']),
+    'initialFilterKey': state.filter,
+    'initialFilterName': _apiFilters2['default'][state.filter].name,
+    'initialTerm': state.term
   };
 
-  var filter = req.query.filter || 'title';
-
-  props.filters[filter].selected = true;
-
-  for (var key in props.filters) {
-    if (props.filters[key].selected) {
-      props.initialFilterKey = key;
-      props.initialFilterName = props.filters[key].name;
-    }
-  }
+  props.filters[state.filter].selected = true;
 
   res.render('../template.hbs', {
-    'data': {
-      'filter': props.initialFilterKey,
-      'term': props.initialTerm
-    },
     'content': _react2['default'].renderToString(_react2['default'].createElement(_componentsFilterFilter2['default'], props)),
+    'state': state,
     'title': 'Client-side filtering with React'
   });
 });
